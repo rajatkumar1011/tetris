@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TETRIS</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='0' y='33.3' width='100' height='33.3' fill='%23FF0D72'/%3E%3Crect x='33.3' y='0' width='33.3' height='100' fill='%23FF0D72'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -43,8 +44,8 @@
         }
 
         #tetris {
-            border: 3px solid var(--glow-color);
-            box-shadow: 0 0 20px var(--glow-color);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
             background-color: #000;
         }
 
@@ -81,6 +82,13 @@
             z-index: 50;
             font-size: 20px;
             line-height: 1;
+        }
+        
+        #infoModal .modal-content {
+            background-color: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(4px);
+            border: 2px solid var(--glow-color);
+            box-shadow: 0 0 15px var(--glow-color), 0 0 5px var(--shadow-color) inset;
         }
 
         #infoModal .modal-content ul {
@@ -175,7 +183,7 @@
             background-color: #e0e0e0;
             border-color: #999;
         }
-         body.theme-white .text-purple-400, body.theme-white .text-cyan-400, body.theme-white .text-green-400 {
+         body.theme-white .text-purple-400, body.theme-white .text-cyan-400, body.theme-white .text-green-400, body.theme-white .text-yellow-400 {
             color: #333;
         }
         body.theme-white #score, body.theme-white #level { color: #222; }
@@ -187,9 +195,14 @@
         }
         body.theme-white .btn-control:hover { background-color: #555; color: #fff; }
         body.theme-white .modal-content {
-            background-color: #f9f9f9;
-            border-color: #777;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+             box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        body.theme-white #infoModal .modal-content {
+            background-color: rgba(250, 250, 250, 0.9);
+            border: 2px solid #555;
+        }
+        body.theme-white #gameOverModal .modal-content {
+             background-color: #f9f9f9;
         }
         body.theme-white #closeInfoBtn { color: #222; }
         body.theme-white footer { color: #666; }
@@ -203,50 +216,50 @@
     <button id="infoBtn" class="rounded-full btn-control">i</button>
     <button id="themeBtn" class="rounded-full btn-control">🎨</button>
 
-    <h1 class="text-4xl md:text-5xl mb-4 md:mb-8 neon-glow">TETRIS</h1>
+    <h1 class="text-3xl md:text-4xl mb-4 md:mb-6 neon-glow">TETRIS</h1>
 
-    <div class="flex flex-col md:flex-row gap-2 items-start">
+    <div class="flex flex-col md:flex-row gap-3 items-start">
         <!-- Game Canvas -->
         <div class="relative">
-            <canvas id="tetris" width="300" height="600"></canvas>
+            <canvas id="tetris" width="210" height="441"></canvas>
         </div>
 
         <!-- Side Panel -->
-        <div class="w-full md:w-[200px] flex flex-col gap-4">
+        <div class="w-full md:w-[140px] flex flex-col gap-3">
             <!-- Score -->
-            <div class="bg-gray-900 p-4 rounded-lg border-2 border-purple-500 shadow-lg text-center">
-                <h2 class="text-lg text-purple-400">SCORE</h2>
-                <p id="score" class="text-3xl mt-1">0</p>
+            <div class="bg-gray-900 p-3 rounded-lg border-2 border-purple-500 shadow-lg text-center">
+                <h2 class="text-base text-purple-400">SCORE</h2>
+                <p id="score" class="text-2xl mt-1">0</p>
             </div>
 
             <!-- Level -->
-            <div class="bg-gray-900 p-4 rounded-lg border-2 border-green-500 shadow-lg text-center">
-                <h2 class="text-lg text-green-400">LEVEL</h2>
-                <p id="level" class="text-3xl mt-1">0</p>
+            <div class="bg-gray-900 p-3 rounded-lg border-2 border-green-500 shadow-lg text-center">
+                <h2 class="text-base text-green-400">LEVEL</h2>
+                <p id="level" class="text-2xl mt-1">0</p>
             </div>
 
             <!-- Next Piece -->
-            <div class="bg-gray-900 p-4 rounded-lg border-2 border-cyan-500 shadow-lg text-center">
-                <h2 class="text-lg text-cyan-400">NEXT</h2>
-                <canvas id="next" width="120" height="120" class="mx-auto mt-2 !border-0 !shadow-none"></canvas>
+            <div class="bg-gray-900 p-3 rounded-lg border-2 border-cyan-500 shadow-lg text-center">
+                <h2 class="text-base text-cyan-400">NEXT</h2>
+                <canvas id="next" width="84" height="84" class="mx-auto mt-1 !border-0 !shadow-none"></canvas>
             </div>
             
             <div class="w-full">
-                <button id="startBtn" class="w-full p-3 rounded-lg text-lg btn-control">START</button>
+                <button id="startBtn" class="w-full p-2 rounded-lg text-base btn-control">START</button>
             </div>
             
             <div class="w-full">
-                <button id="restartGameBtn" class="w-full p-3 rounded-lg text-lg btn-control">RESTART</button>
+                <button id="restartGameBtn" class="w-full p-2 rounded-lg text-base btn-control">RESTART</button>
             </div>
         </div>
     </div>
 
     <!-- Mobile Touch Controls -->
-    <div class="md:hidden mt-4 grid grid-cols-3 grid-rows-2 gap-2 w-full max-w-sm">
-         <button id="touch-left" class="col-start-1 row-start-2 text-2xl rounded-lg btn-control">&#x2190;</button>
-         <button id="touch-right" class="col-start-3 row-start-2 text-2xl rounded-lg btn-control">&#x2192;</button>
-         <button id="touch-rotate" class="col-start-2 row-start-1 text-2xl rounded-lg btn-control">&#x21BB;</button>
-         <button id="touch-down" class="col-start-2 row-start-2 text-2xl rounded-lg btn-control">&#x2193;</button>
+    <div class="md:hidden mt-3 grid grid-cols-3 grid-rows-2 gap-2 w-[210px]">
+         <button id="touch-left" class="col-start-1 row-start-2 text-xl rounded-lg btn-control">&#x2190;</button>
+         <button id="touch-right" class="col-start-3 row-start-2 text-xl rounded-lg btn-control">&#x2192;</button>
+         <button id="touch-rotate" class="col-start-2 row-start-1 text-xl rounded-lg btn-control">&#x21BB;</button>
+         <button id="touch-down" class="col-start-2 row-start-2 text-xl rounded-lg btn-control">&#x2193;</button>
     </div>
 
     <!-- Footer -->
@@ -264,14 +277,14 @@
     </footer>
 
     <!-- Info Modal -->
-    <div id="infoModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 bg-black bg-opacity-80">
-        <div class="modal-content p-6 rounded-lg text-center max-w-sm relative">
+    <div id="infoModal" class="fixed inset-0 flex items-start justify-start pt-20 pl-4 hidden opacity-0 transition-opacity duration-300 bg-black bg-opacity-80 z-50">
+        <div class="modal-content p-4 rounded-lg text-center max-w-[280px] relative">
             <button id="closeInfoBtn">&times;</button>
             <h2 class="text-2xl neon-glow mb-4">HOW TO PLAY</h2>
             
-            <div class="text-left space-y-3 text-sm">
+            <div class="text-left space-y-3 text-xs">
                 <div>
-                    <h3 class="text-lg text-cyan-400 mb-1">CONTROLS</h3>
+                    <h3 class="text-base text-cyan-400 mb-1">CONTROLS</h3>
                     <ul class="list-disc list-inside">
                         <li><strong>Arrow Keys:</strong> Move Left/Right/Down</li>
                         <li><strong>Up Arrow:</strong> Rotate Piece</li>
@@ -281,7 +294,7 @@
                 </div>
 
                 <div>
-                    <h3 class="text-lg text-purple-400 mb-1">SCORING</h3>
+                    <h3 class="text-base text-purple-400 mb-1">SCORING</h3>
                     <ul class="list-disc list-inside">
                         <li><strong>1 Line:</strong> 100 Points</li>
                         <li><strong>2 Lines:</strong> 300 Points</li>
@@ -291,12 +304,12 @@
                 </div>
 
                 <div>
-                    <h3 class="text-lg text-green-400 mb-1">LEVELING UP</h3>
+                    <h3 class="text-base text-green-400 mb-1">LEVELING UP</h3>
                     <p>Clear 10 lines to advance to the next level. Each level increases the falling speed of the pieces!</p>
                 </div>
 
                  <div>
-                    <h3 class="text-lg text-yellow-400 mb-1">OBJECTIVE</h3>
+                    <h3 class="text-base text-yellow-400 mb-1">OBJECTIVE</h3>
                     <p>Complete horizontal lines to clear them from the board. The game ends if the blocks stack up to the top of the screen.</p>
                 </div>
             </div>
@@ -304,7 +317,7 @@
     </div>
 
     <!-- Game Over Modal -->
-    <div id="gameOverModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0">
+    <div id="gameOverModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0 z-50">
         <div class="modal-content p-8 rounded-lg text-center max-w-sm">
             <h2 class="text-4xl neon-glow mb-4">GAME OVER</h2>
             <p class="text-xl mb-2">Final Score:</p>
@@ -340,9 +353,9 @@
 
         // --- Game Constants ---
         const COLS = 10;
-        const ROWS = 20;
-        const BLOCK_SIZE = 30;
-        const NEXT_BLOCK_SIZE = 30;
+        const ROWS = 21;
+        const BLOCK_SIZE = 21;
+        const NEXT_BLOCK_SIZE = 21;
         
         const COLORS = [
             null,
@@ -758,15 +771,19 @@
         infoBtn.addEventListener('click', () => {
             wasPausedBeforeInfo = isPaused || isGameOver;
             isPaused = true;
-            infoModal.classList.remove('hidden', 'opacity-0');
+            infoModal.classList.remove('hidden');
+            setTimeout(() => infoModal.classList.remove('opacity-0'), 10);
         });
 
         function closeInfoModal() {
-            infoModal.classList.add('hidden', 'opacity-0');
-            isPaused = wasPausedBeforeInfo;
-             if (!isPaused) {
-                update();
-            }
+            infoModal.classList.add('opacity-0');
+            setTimeout(() => {
+                infoModal.classList.add('hidden');
+                isPaused = wasPausedBeforeInfo;
+                 if (!isPaused) {
+                    update();
+                }
+            }, 300);
         }
 
         closeInfoBtn.addEventListener('click', closeInfoModal);
@@ -788,11 +805,5 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
