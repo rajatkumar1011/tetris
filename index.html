@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TETRIS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --background-color: #0d0d0d;
+            --grid-color: #333;
+            --text-color: #f0f0f0;
+            --glow-color: rgba(0, 255, 255, 0.7);
+            --shadow-color: rgba(255, 0, 255, 0.7);
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow-y: auto; /* Allow vertical scrolling if content overflows */
+            touch-action: manipulation; /* Allows scrolling but prevents unwanted zoom */
+        }
+
+        .neon-glow {
+            text-shadow:
+                0 0 5px var(--glow-color),
+                0 0 10px var(--glow-color),
+                0 0 20px var(--glow-color),
+                0 0 40px var(--shadow-color),
+                0 0 80px var(--shadow-color);
+        }
+
+        canvas {
+            border: 3px solid var(--glow-color);
+            box-shadow: 0 0 15px var(--glow-color);
+            background-color: #000;
+        }
+
+        .btn-control {
+            transition: all 0.2s ease-in-out;
+            border: 2px solid var(--shadow-color);
+            box-shadow: 0 0 10px var(--shadow-color);
+        }
+
+        .btn-control:hover, .btn-control:focus {
+            transform: scale(1.05);
+            background-color: var(--shadow-color);
+            color: #000;
+            box-shadow: 0 0 20px var(--shadow-color);
+        }
+
+        .btn-control:active {
+            transform: scale(0.95);
+        }
+        
+        /* Modal styles */
+        #gameOverModal {
+            background-color: rgba(0, 0, 0, 0.8);
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #111;
+            border: 3px solid var(--glow-color);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+        
+        /* For mobile button controls */
+        .touch-controls button {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+        }
+
+        #infoBtn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 40px;
+            height: 40px;
+            z-index: 50;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        #infoModal .modal-content ul {
+            text-align: left;
+            margin-top: 1rem;
+        }
+
+        #infoModal .modal-content li {
+            margin-bottom: 0.5rem;
+        }
+
+         #infoModal .modal-content strong {
+            color: var(--shadow-color);
+         }
+
+         #closeInfoBtn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: color 0.2s;
+         }
+         #closeInfoBtn:hover {
+            color: var(--glow-color);
+         }
+        
+        /* Footer Styles */
+        footer {
+            /* Positioned at the bottom, but relative to the flow to push content up */
+            width: 100%;
+            font-size: 0.75rem; /* 12px */
+            color: #aaa;
+            margin-top: 1.5rem; /* Add space between controls and footer */
+            padding-bottom: 1rem; /* Add some space at the very bottom */
+        }
+
+        .social-icon {
+            color: var(--text-color);
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .social-icon:hover {
+            color: var(--glow-color);
+            transform: scale(1.1);
+        }
+
+        .heart {
+            color: #FF0D72; /* Use a color from the game palette */
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+            font-size: 1em; /* Ensure emoji scales with text */
+            vertical-align: middle; /* Better align with text */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .made-by-text, .copyright-text {
+            text-shadow: 1px 1px 3px #000;
+        }
+    </style>
+</head>
+<body class="bg-black flex flex-col items-center justify-center min-h-screen p-4">
+
+    <button id="infoBtn" class="rounded-full btn-control">i</button>
+
+    <h1 class="text-4xl md:text-5xl mb-4 md:mb-8 neon-glow">TETRIS</h1>
+
+    <div class="flex flex-col md:flex-row gap-4 items-start">
+        <!-- Game Canvas -->
+        <div class="relative">
+            <canvas id="tetris" width="300" height="600"></canvas>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="w-full md:w-[200px] flex flex-col gap-4">
+            <!-- Score -->
+            <div class="bg-gray-900 p-4 rounded-lg border-2 border-purple-500 shadow-lg text-center">
+                <h2 class="text-lg text-purple-400">SCORE</h2>
+                <p id="score" class="text-3xl mt-1">0</p>
+            </div>
+
+            <!-- Level -->
+            <div class="bg-gray-900 p-4 rounded-lg border-2 border-green-500 shadow-lg text-center">
+                <h2 class="text-lg text-green-400">LEVEL</h2>
+                <p id="level" class="text-3xl mt-1">0</p>
+            </div>
+
+            <!-- Next Piece -->
+            <div class="bg-gray-900 p-4 rounded-lg border-2 border-cyan-500 shadow-lg text-center">
+                <h2 class="text-lg text-cyan-400">NEXT</h2>
+                <canvas id="next" width="120" height="120" class="mx-auto mt-2 !border-0 !shadow-none"></canvas>
+            </div>
+            
+            <div class="w-full">
+                <button id="startBtn" class="w-full p-3 bg-gray-800 rounded-lg text-lg btn-control">START</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Touch Controls -->
+    <div class="md:hidden mt-4 grid grid-cols-3 grid-rows-2 gap-2 w-full max-w-sm">
+         <button id="touch-left" class="col-start-1 row-start-2 text-2xl bg-gray-800 rounded-lg btn-control">&#x2190;</button>
+         <button id="touch-right" class="col-start-3 row-start-2 text-2xl bg-gray-800 rounded-lg btn-control">&#x2192;</button>
+         <button id="touch-rotate" class="col-start-2 row-start-1 text-2xl bg-gray-800 rounded-lg btn-control">&#x21BB;</button>
+         <button id="touch-down" class="col-start-2 row-start-2 text-2xl bg-gray-800 rounded-lg btn-control">&#x2193;</button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="flex justify-center gap-6 mb-2">
+            <a href="https://www.linkedin.com/in/rajatkumar7/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <a href="https://github.com/rajatkumar1011" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+        </div>
+        <p class="made-by-text mb-1">Made with <span class="heart">&hearts;</span> by Rajat Kumar</p>
+        <p class="copyright-text">&copy; 2025 Rajat Kumar. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 bg-black bg-opacity-80">
+        <div class="modal-content p-8 rounded-lg text-center max-w-md relative">
+            <button id="closeInfoBtn">&times;</button>
+            <h2 class="text-3xl neon-glow mb-4">HOW TO PLAY</h2>
+            
+            <div class="text-left space-y-4">
+                <div>
+                    <h3 class="text-xl text-cyan-400 mb-2">CONTROLS</h3>
+                    <ul class="list-disc list-inside">
+                        <li><strong>Arrow Keys:</strong> Move Left/Right/Down</li>
+                        <li><strong>Up Arrow:</strong> Rotate Piece</li>
+                        <li><strong>Spacebar:</strong> Hard Drop (Instantly drop piece)</li>
+                        <li><strong>START/PAUSE:</strong> Toggles the game state</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl text-purple-400 mb-2">SCORING</h3>
+                    <ul class="list-disc list-inside">
+                        <li><strong>1 Line:</strong> 100 Points</li>
+                        <li><strong>2 Lines:</strong> 300 Points</li>
+                        <li><strong>3 Lines:</strong> 500 Points</li>
+                        <li><strong>4 Lines (Tetris):</strong> 800 Points</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl text-green-400 mb-2">LEVELING UP</h3>
+                    <p>Clear 10 lines to advance to the next level. Each level increases the falling speed of the pieces!</p>
+                </div>
+
+                 <div>
+                    <h3 class="text-xl text-yellow-400 mb-2">OBJECTIVE</h3>
+                    <p>Complete horizontal lines to clear them from the board. The game ends if the blocks stack up to the top of the screen.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0">
+        <div class="modal-content p-8 rounded-lg text-center max-w-sm">
+            <h2 class="text-4xl neon-glow mb-4">GAME OVER</h2>
+            <p class="text-xl mb-2">Final Score:</p>
+            <p id="finalScore" class="text-3xl text-yellow-400 mb-6">0</p>
+            <button id="restartBtn" class="w-full p-3 bg-gray-800 rounded-lg text-lg btn-control">RESTART</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const canvas = document.getElementById('tetris');
+        const context = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('next');
+        const nextContext = nextCanvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const gameOverModal = document.getElementById('gameOverModal');
+        const finalScoreElement = document.getElementById('finalScore');
+        const infoBtn = document.getElementById('infoBtn');
+        const infoModal = document.getElementById('infoModal');
+        const closeInfoBtn = document.getElementById('closeInfoBtn');
+        
+        // Touch controls
+        const touchLeft = document.getElementById('touch-left');
+        const touchRight = document.getElementById('touch-right');
+        const touchRotate = document.getElementById('touch-rotate');
+        const touchDown = document.getElementById('touch-down');
+
+
+        // --- Game Constants ---
+        const COLS = 10;
+        const ROWS = 20;
+        const BLOCK_SIZE = 30;
+        const NEXT_BLOCK_SIZE = 30;
+        
+        const COLORS = [
+            null,
+            '#FF0D72', // T
+            '#0DC2FF', // O
+            '#0DFF72', // L
+            '#F538FF', // J
+            '#FF8E0D', // I
+            '#FFE138', // S
+            '#3877FF', // Z
+        ];
+
+        const SHAPES = [
+            [], // Empty shape at index 0
+            [[1, 1, 1], [0, 1, 0]],                 // T
+            [[2, 2], [2, 2]],                       // O
+            [[0, 0, 3], [3, 3, 3]],                 // L
+            [[4, 0, 0], [4, 4, 4]],                 // J
+            [[0, 0, 0, 0], [5, 5, 5, 5], [0, 0, 0, 0]], // I
+            [[0, 6, 6], [6, 6, 0]],                 // S
+            [[7, 7, 0], [0, 7, 7]],                 // Z
+        ];
+
+        // --- Game State ---
+        let board = createBoard();
+        let player;
+        let nextPiece;
+        let score = 0;
+        let level = 0;
+        let linesClearedTotal = 0;
+        let dropCounter = 0;
+        let dropInterval = 1000; // ms
+        let lastTime = 0;
+        let isPaused = true;
+        let isGameOver = false;
+        const LINES_PER_LEVEL = 10;
+        let animationFrameId;
+        let wasPausedBeforeInfo = false;
+
+        // --- Core Functions ---
+        
+        function createBoard() {
+            return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+        }
+
+        function createPiece(type) {
+            if (type === 'T') return [[1, 1, 1], [0, 1, 0]];
+            if (type === 'O') return [[2, 2], [2, 2]];
+            if (type === 'L') return [[0, 0, 3], [3, 3, 3]];
+            if (type === 'J') return [[4, 0, 0], [4, 4, 4]];
+            if (type === 'I') return [[0, 0, 0, 0], [5, 5, 5, 5], [0, 0, 0, 0]];
+            if (type === 'S') return [[0, 6, 6], [6, 6, 0]];
+            if (type === 'Z') return [[7, 7, 0], [0, 7, 7]];
+        }
+
+        function playerReset() {
+            const pieces = 'TOLJISZ';
+            const randPiece = pieces[Math.floor(Math.random() * pieces.length)];
+            const newMatrix = createPiece(randPiece);
+
+            player.matrix = nextPiece.matrix;
+            player.pos.y = 0;
+            player.pos.x = Math.floor(COLS / 2) - Math.floor(player.matrix[0].length / 2);
+
+            nextPiece.matrix = newMatrix;
+            
+            if (checkCollision(board, player)) {
+                gameOver();
+            }
+        }
+        
+        function initializePlayer() {
+            const pieces = 'TOLJISZ';
+            const randPiece1 = pieces[Math.floor(Math.random() * pieces.length)];
+            const randPiece2 = pieces[Math.floor(Math.random() * pieces.length)];
+            
+            player = {
+                pos: { x: 0, y: 0 },
+                matrix: createPiece(randPiece1),
+            };
+            
+            nextPiece = {
+                matrix: createPiece(randPiece2),
+            };
+            
+            player.pos.y = 0;
+            player.pos.x = Math.floor(COLS / 2) - Math.floor(player.matrix[0].length / 2);
+        }
+
+        // --- Game Loop ---
+
+        function update(time = 0) {
+            if (isPaused || isGameOver) return;
+
+            const deltaTime = time - lastTime;
+            lastTime = time;
+
+            dropCounter += deltaTime;
+            if (dropCounter > dropInterval) {
+                playerDrop();
+            }
+
+            draw();
+            animationFrameId = requestAnimationFrame(update);
+        }
+
+        function draw() {
+            // Draw main board
+            context.fillStyle = '#000';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            drawMatrix(board, { x: 0, y: 0 }, context, BLOCK_SIZE);
+            drawMatrix(player.matrix, player.pos, context, BLOCK_SIZE);
+            
+            // Draw next piece
+            nextContext.fillStyle = '#000';
+            nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            
+            const nextMatrix = nextPiece.matrix;
+            const offsetX = (nextCanvas.width / NEXT_BLOCK_SIZE - nextMatrix[0].length) / 2;
+            const offsetY = (nextCanvas.height / NEXT_BLOCK_SIZE - nextMatrix.length) / 2;
+            drawMatrix(nextMatrix, {x: offsetX, y: offsetY}, nextContext, NEXT_BLOCK_SIZE);
+        }
+
+        function drawMatrix(matrix, offset, ctx, blockSize) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        ctx.fillStyle = COLORS[value];
+                        ctx.fillRect((x + offset.x) * blockSize, (y + offset.y) * blockSize, blockSize, blockSize);
+                        ctx.strokeStyle = '#000';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect((x + offset.x) * blockSize, (y + offset.y) * blockSize, blockSize, blockSize);
+                    }
+                });
+            });
+        }
+        
+        // --- Player Movement & Collision ---
+
+        function playerDrop() {
+            player.pos.y++;
+            if (checkCollision(board, player)) {
+                player.pos.y--;
+                merge(board, player);
+                sweepBoard();
+                playerReset();
+                updateScore(0); // Updates score display
+            }
+            dropCounter = 0;
+        }
+
+        function playerMove(dir) {
+            player.pos.x += dir;
+            if (checkCollision(board, player)) {
+                player.pos.x -= dir;
+            }
+        }
+
+        function playerRotate() {
+            const originalMatrix = player.matrix;
+            const originalPos = player.pos.x;
+
+            player.matrix = rotate(player.matrix); // Apply new rotation
+
+            let offset = 1;
+            while (checkCollision(board, player)) {
+                player.pos.x += offset;
+                offset = -(offset + (offset > 0 ? 1 : -1));
+                if (Math.abs(offset) > player.matrix[0].length) {
+                    // Wall kick failed, revert everything
+                    player.matrix = originalMatrix;
+                    player.pos.x = originalPos;
+                    return;
+                }
+            }
+        }
+        
+        function playerHardDrop() {
+            while (!checkCollision(board, player)) {
+                player.pos.y++;
+            }
+            player.pos.y--;
+            merge(board, player);
+            sweepBoard();
+            playerReset();
+            updateScore(0);
+            dropCounter = 0;
+        }
+
+        function rotate(matrix) {
+            // Transpose + reverse = 90-degree clockwise rotation for any matrix
+            const transposed = matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+            transposed.forEach(row => row.reverse());
+            return transposed;
+        }
+
+        function checkCollision(board, player) {
+            const { matrix, pos } = player;
+            for (let y = 0; y < matrix.length; y++) {
+                for (let x = 0; x < matrix[y].length; x++) {
+                    if (
+                        matrix[y][x] !== 0 &&
+                        (board[y + pos.y] && board[y + pos.y][x + pos.x]) !== 0
+                    ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function merge(board, player) {
+            player.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        board[y + player.pos.y][x + player.pos.x] = value;
+                    }
+                });
+            });
+        }
+        
+        // --- Scoring and Line Clearing ---
+        
+        function sweepBoard() {
+            let clearedLines = 0;
+            outer: for (let y = board.length - 1; y > 0; --y) {
+                for (let x = 0; x < board[y].length; ++x) {
+                    if (board[y][x] === 0) {
+                        continue outer;
+                    }
+                }
+                
+                const row = board.splice(y, 1)[0].fill(0);
+                board.unshift(row);
+                ++y;
+                clearedLines++;
+            }
+            
+            if (clearedLines > 0) {
+                const lineScores = [0, 100, 300, 500, 800];
+                updateScore(lineScores[clearedLines]);
+                linesClearedTotal += clearedLines;
+
+                const newLevel = Math.floor(linesClearedTotal / LINES_PER_LEVEL);
+                if (newLevel > level) {
+                    level = newLevel;
+                    // Increase speed: decrease interval.
+                    dropInterval = Math.max(100, 1000 - level * 75);
+                    updateLevel();
+                }
+            }
+        }
+        
+        function updateScore(points) {
+            score += points;
+            scoreElement.innerText = score;
+        }
+
+        function updateLevel() {
+            levelElement.innerText = level;
+        }
+        
+        // --- Game State Management ---
+
+        function startGame() {
+            board = createBoard();
+            initializePlayer();
+            playerReset();
+            score = 0;
+            level = 0;
+            linesClearedTotal = 0;
+            updateScore(0);
+            updateLevel();
+            isPaused = false;
+            isGameOver = false;
+            lastTime = 0;
+            dropInterval = 1000;
+            gameOverModal.classList.add('hidden', 'opacity-0');
+            startBtn.textContent = 'PAUSE';
+            
+            if(animationFrameId) cancelAnimationFrame(animationFrameId);
+            update();
+        }
+
+        function pauseGame() {
+            isPaused = !isPaused;
+            startBtn.textContent = isPaused ? 'RESUME' : 'PAUSE';
+            if (!isPaused) {
+                update();
+            }
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            isPaused = true;
+            cancelAnimationFrame(animationFrameId);
+            finalScoreElement.innerText = score;
+            gameOverModal.classList.remove('hidden');
+            setTimeout(() => gameOverModal.classList.remove('opacity-0'), 10);
+        }
+
+        // --- Event Listeners ---
+
+        document.addEventListener('keydown', event => {
+            if (isPaused || isGameOver) return;
+            
+            if (event.key === 'ArrowLeft') {
+                playerMove(-1);
+            } else if (event.key === 'ArrowRight') {
+                playerMove(1);
+            } else if (event.key === 'ArrowDown') {
+                playerDrop();
+            } else if (event.key === 'ArrowUp' || event.key === 'q') {
+                playerRotate();
+            } else if (event.key === ' ') {
+                event.preventDefault(); // Prevent page scroll
+                playerHardDrop();
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (isGameOver) {
+                startGame();
+                return;
+            }
+
+            if (isPaused) {
+                isPaused = false;
+                startBtn.textContent = 'PAUSE';
+                update();
+            } else {
+                isPaused = true;
+                startBtn.textContent = 'RESUME';
+            }
+        });
+        
+        restartBtn.addEventListener('click', () => {
+            startGame();
+        });
+
+        infoBtn.addEventListener('click', () => {
+            wasPausedBeforeInfo = isPaused || isGameOver;
+            isPaused = true;
+            infoModal.classList.remove('hidden', 'opacity-0');
+        });
+
+        function closeInfoModal() {
+            infoModal.classList.add('hidden', 'opacity-0');
+            isPaused = wasPausedBeforeInfo;
+             if (!isPaused) {
+                update();
+            }
+        }
+
+        closeInfoBtn.addEventListener('click', closeInfoModal);
+        
+        infoModal.addEventListener('click', (e) => {
+             if (e.target === infoModal) {
+                closeInfoModal();
+            }
+        });
+        
+        // Touch controls logic
+        touchLeft.addEventListener('click', () => !isPaused && !isGameOver && playerMove(-1));
+        touchRight.addEventListener('click', () => !isPaused && !isGameOver && playerMove(1));
+        touchRotate.addEventListener('click', () => !isPaused && !isGameOver && playerRotate());
+        touchDown.addEventListener('click', () => !isPaused && !isGameOver && playerDrop());
+
+        // --- Initial Draw ---
+        initializePlayer();
+        draw();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
