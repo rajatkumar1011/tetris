@@ -19,10 +19,18 @@
 
         body {
             font-family: 'Press Start 2P', cursive;
-            background-color: var(--background-color);
             color: var(--text-color);
             overflow-y: auto; /* Allow vertical scrolling if content overflows */
             touch-action: manipulation; /* Allows scrolling but prevents unwanted zoom */
+            background: linear-gradient(270deg, #0d0221, #240046, #5a189a, #9b2226, #005f73, #0a9396);
+            background-size: 1200% 1200%;
+            animation: gradientShift 45s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .neon-glow {
@@ -31,55 +39,43 @@
                 0 0 10px var(--glow-color),
                 0 0 20px var(--glow-color),
                 0 0 40px var(--shadow-color),
-                0 0 80px var(--shadow-color);
+                0 0 70px var(--shadow-color);
         }
 
-        canvas {
+        #tetris {
             border: 3px solid var(--glow-color);
-            box-shadow: 0 0 15px var(--glow-color);
+            box-shadow: 0 0 20px var(--glow-color);
             background-color: #000;
         }
 
         .btn-control {
-            transition: all 0.2s ease-in-out;
-            border: 2px solid var(--shadow-color);
-            box-shadow: 0 0 10px var(--shadow-color);
+            border: 2px solid var(--glow-color);
+            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(0, 255, 255, 0.5);
+            background-color: rgba(13, 13, 13, 0.6);
+            backdrop-filter: blur(2px);
+            transition: background-color 0.2s, box-shadow 0.2s;
+            font-weight: bold;
         }
-
-        .btn-control:hover, .btn-control:focus {
-            transform: scale(1.05);
-            background-color: var(--shadow-color);
-            color: #000;
-            box-shadow: 0 0 20px var(--shadow-color);
-        }
-
-        .btn-control:active {
-            transform: scale(0.95);
+        .btn-control:hover {
+            background-color: rgba(0, 255, 255, 0.2);
+            box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.8);
         }
         
-        /* Modal styles */
-        #gameOverModal {
-            background-color: rgba(0, 0, 0, 0.8);
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: #111;
-            border: 3px solid var(--glow-color);
-            box-shadow: 0 0 20px var(--glow-color);
-        }
-        
-        /* For mobile button controls */
-        .touch-controls button {
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-        }
-
         #infoBtn {
             position: absolute;
             top: 1rem;
             left: 1rem;
+            width: 40px;
+            height: 40px;
+            z-index: 50;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        #themeBtn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
             width: 40px;
             height: 40px;
             z-index: 50;
@@ -119,9 +115,9 @@
         footer {
             /* Positioned at the bottom, but relative to the flow to push content up */
             width: 100%;
-            font-size: 0.75rem; /* 12px */
+            font-size: 0.625rem; /* 10px */
             color: #aaa;
-            margin-top: 1.5rem; /* Add space between controls and footer */
+            margin-top: 3rem; /* Add more space between controls and footer */
             padding-bottom: 1rem; /* Add some space at the very bottom */
         }
 
@@ -152,15 +148,64 @@
         .made-by-text, .copyright-text {
             text-shadow: 1px 1px 3px #000;
         }
+
+        /* --- Theme Overrides --- */
+        /* Black Theme */
+        body.theme-black {
+            background: #0d0d0d;
+            animation: none;
+        }
+        
+        /* White Theme */
+        body.theme-white {
+            background: #f0f0f0;
+            color: #222;
+            animation: none;
+        }
+        body.theme-white .neon-glow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: #111;
+        }
+        body.theme-white canvas {
+            border-color: #555;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        body.theme-white #tetris { background-color: #fdfdfd; }
+        body.theme-white .bg-gray-900 {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+         body.theme-white .text-purple-400, body.theme-white .text-cyan-400, body.theme-white .text-green-400 {
+            color: #333;
+        }
+        body.theme-white #score, body.theme-white #level { color: #222; }
+        body.theme-white .btn-control {
+            border-color: #555;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            color: #222;
+            background-color: #e9e9e9;
+        }
+        body.theme-white .btn-control:hover { background-color: #555; color: #fff; }
+        body.theme-white .modal-content {
+            background-color: #f9f9f9;
+            border-color: #777;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        body.theme-white #closeInfoBtn { color: #222; }
+        body.theme-white footer { color: #666; }
+        body.theme-white .social-icon { color: #222; }
+        body.theme-white .social-icon:hover { color: #5a189a; }
+        body.theme-white .made-by-text, body.theme-white .copyright-text { text-shadow: none; }
     </style>
 </head>
-<body class="bg-black flex flex-col items-center justify-center min-h-screen p-4">
+<body class="flex flex-col items-center justify-center min-h-screen p-4 theme-mix">
 
     <button id="infoBtn" class="rounded-full btn-control">i</button>
+    <button id="themeBtn" class="rounded-full btn-control">🎨</button>
 
     <h1 class="text-4xl md:text-5xl mb-4 md:mb-8 neon-glow">TETRIS</h1>
 
-    <div class="flex flex-col md:flex-row gap-4 items-start">
+    <div class="flex flex-col md:flex-row gap-2 items-start">
         <!-- Game Canvas -->
         <div class="relative">
             <canvas id="tetris" width="300" height="600"></canvas>
@@ -187,27 +232,31 @@
             </div>
             
             <div class="w-full">
-                <button id="startBtn" class="w-full p-3 bg-gray-800 rounded-lg text-lg btn-control">START</button>
+                <button id="startBtn" class="w-full p-3 rounded-lg text-lg btn-control">START</button>
+            </div>
+            
+            <div class="w-full">
+                <button id="restartGameBtn" class="w-full p-3 rounded-lg text-lg btn-control">RESTART</button>
             </div>
         </div>
     </div>
 
     <!-- Mobile Touch Controls -->
     <div class="md:hidden mt-4 grid grid-cols-3 grid-rows-2 gap-2 w-full max-w-sm">
-         <button id="touch-left" class="col-start-1 row-start-2 text-2xl bg-gray-800 rounded-lg btn-control">&#x2190;</button>
-         <button id="touch-right" class="col-start-3 row-start-2 text-2xl bg-gray-800 rounded-lg btn-control">&#x2192;</button>
-         <button id="touch-rotate" class="col-start-2 row-start-1 text-2xl bg-gray-800 rounded-lg btn-control">&#x21BB;</button>
-         <button id="touch-down" class="col-start-2 row-start-2 text-2xl bg-gray-800 rounded-lg btn-control">&#x2193;</button>
+         <button id="touch-left" class="col-start-1 row-start-2 text-2xl rounded-lg btn-control">&#x2190;</button>
+         <button id="touch-right" class="col-start-3 row-start-2 text-2xl rounded-lg btn-control">&#x2192;</button>
+         <button id="touch-rotate" class="col-start-2 row-start-1 text-2xl rounded-lg btn-control">&#x21BB;</button>
+         <button id="touch-down" class="col-start-2 row-start-2 text-2xl rounded-lg btn-control">&#x2193;</button>
     </div>
 
     <!-- Footer -->
     <footer class="text-center">
         <div class="flex justify-center gap-6 mb-2">
             <a href="https://www.linkedin.com/in/rajatkumar7/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
             </a>
             <a href="https://github.com/rajatkumar1011" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
             </a>
         </div>
         <p class="made-by-text mb-1">Made with <span class="heart">&hearts;</span> by Rajat Kumar</p>
@@ -216,13 +265,13 @@
 
     <!-- Info Modal -->
     <div id="infoModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 bg-black bg-opacity-80">
-        <div class="modal-content p-8 rounded-lg text-center max-w-md relative">
+        <div class="modal-content p-6 rounded-lg text-center max-w-sm relative">
             <button id="closeInfoBtn">&times;</button>
-            <h2 class="text-3xl neon-glow mb-4">HOW TO PLAY</h2>
+            <h2 class="text-2xl neon-glow mb-4">HOW TO PLAY</h2>
             
-            <div class="text-left space-y-4">
+            <div class="text-left space-y-3 text-sm">
                 <div>
-                    <h3 class="text-xl text-cyan-400 mb-2">CONTROLS</h3>
+                    <h3 class="text-lg text-cyan-400 mb-1">CONTROLS</h3>
                     <ul class="list-disc list-inside">
                         <li><strong>Arrow Keys:</strong> Move Left/Right/Down</li>
                         <li><strong>Up Arrow:</strong> Rotate Piece</li>
@@ -232,7 +281,7 @@
                 </div>
 
                 <div>
-                    <h3 class="text-xl text-purple-400 mb-2">SCORING</h3>
+                    <h3 class="text-lg text-purple-400 mb-1">SCORING</h3>
                     <ul class="list-disc list-inside">
                         <li><strong>1 Line:</strong> 100 Points</li>
                         <li><strong>2 Lines:</strong> 300 Points</li>
@@ -242,12 +291,12 @@
                 </div>
 
                 <div>
-                    <h3 class="text-xl text-green-400 mb-2">LEVELING UP</h3>
+                    <h3 class="text-lg text-green-400 mb-1">LEVELING UP</h3>
                     <p>Clear 10 lines to advance to the next level. Each level increases the falling speed of the pieces!</p>
                 </div>
 
                  <div>
-                    <h3 class="text-xl text-yellow-400 mb-2">OBJECTIVE</h3>
+                    <h3 class="text-lg text-yellow-400 mb-1">OBJECTIVE</h3>
                     <p>Complete horizontal lines to clear them from the board. The game ends if the blocks stack up to the top of the screen.</p>
                 </div>
             </div>
@@ -273,12 +322,14 @@
         const scoreElement = document.getElementById('score');
         const levelElement = document.getElementById('level');
         const startBtn = document.getElementById('startBtn');
+        const restartGameBtn = document.getElementById('restartGameBtn');
         const restartBtn = document.getElementById('restartBtn');
         const gameOverModal = document.getElementById('gameOverModal');
         const finalScoreElement = document.getElementById('finalScore');
         const infoBtn = document.getElementById('infoBtn');
         const infoModal = document.getElementById('infoModal');
         const closeInfoBtn = document.getElementById('closeInfoBtn');
+        const themeBtn = document.getElementById('themeBtn');
         
         // Touch controls
         const touchLeft = document.getElementById('touch-left');
@@ -330,6 +381,7 @@
         const LINES_PER_LEVEL = 10;
         let animationFrameId;
         let wasPausedBeforeInfo = false;
+        let gameInProgress = false;
 
         // --- Core Functions ---
         
@@ -402,6 +454,9 @@
             // Draw main board
             context.fillStyle = '#000';
             context.fillRect(0, 0, canvas.width, canvas.height);
+            
+            drawGrid(context); // Draw the background grid
+
             drawMatrix(board, { x: 0, y: 0 }, context, BLOCK_SIZE);
             drawMatrix(player.matrix, player.pos, context, BLOCK_SIZE);
             
@@ -427,6 +482,34 @@
                     }
                 });
             });
+        }
+
+        function drawGrid(ctx) {
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.2)'; // Faint cyan lines
+            ctx.shadowColor = 'rgba(0, 255, 255, 0.5)';
+            ctx.shadowBlur = 7;
+            ctx.lineWidth = 1;
+
+            // Vertical lines
+            for (let x = 0; x <= COLS; x++) {
+                const xPos = x * BLOCK_SIZE;
+                ctx.beginPath();
+                ctx.moveTo(xPos, 0);
+                ctx.lineTo(xPos, ROWS * BLOCK_SIZE);
+                ctx.stroke();
+            }
+
+            // Horizontal lines
+            for (let y = 0; y <= ROWS; y++) {
+                const yPos = y * BLOCK_SIZE;
+                ctx.beginPath();
+                ctx.moveTo(0, yPos);
+                ctx.lineTo(COLS * BLOCK_SIZE, yPos);
+                ctx.stroke();
+            }
+
+             // Reset shadow properties so they don't affect the Tetriminos
+            ctx.shadowBlur = 0;
         }
         
         // --- Player Movement & Collision ---
@@ -556,7 +639,34 @@
         
         // --- Game State Management ---
 
+        function resetGame() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            gameInProgress = false;
+            isPaused = true;
+            isGameOver = false;
+            board = createBoard();
+            score = 0;
+            level = 0;
+            linesClearedTotal = 0;
+            updateScore(0);
+            updateLevel();
+            startBtn.textContent = 'START';
+            gameOverModal.classList.add('hidden', 'opacity-0');
+            
+            // Clear canvases and draw the empty grid
+            context.fillStyle = '#000';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            drawGrid(context);
+
+            nextContext.fillStyle = '#000';
+            nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+        }
+
         function startGame() {
+            gameInProgress = true;
             board = createBoard();
             initializePlayer();
             playerReset();
@@ -587,6 +697,7 @@
         function gameOver() {
             isGameOver = true;
             isPaused = true;
+            gameInProgress = false;
             cancelAnimationFrame(animationFrameId);
             finalScoreElement.innerText = score;
             gameOverModal.classList.remove('hidden');
@@ -612,24 +723,36 @@
             }
         });
 
-        startBtn.addEventListener('click', () => {
-            if (isGameOver) {
-                startGame();
-                return;
+        themeBtn.addEventListener('click', () => {
+            const themes = ['theme-mix', 'theme-black', 'theme-white'];
+            let currentTheme = '';
+            for (const theme of themes) {
+                if (document.body.classList.contains(theme)) {
+                    currentTheme = theme;
+                    break;
+                }
             }
 
-            if (isPaused) {
-                isPaused = false;
-                startBtn.textContent = 'PAUSE';
-                update();
+            const nextThemeIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
+            
+            document.body.classList.remove(...themes);
+            document.body.classList.add(themes[nextThemeIndex]);
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (!gameInProgress) {
+                startGame();
             } else {
-                isPaused = true;
-                startBtn.textContent = 'RESUME';
+                pauseGame();
             }
         });
         
-        restartBtn.addEventListener('click', () => {
+        restartBtn.addEventListener('click', () => { // Button in the "Game Over" modal
             startGame();
+        });
+
+        restartGameBtn.addEventListener('click', () => { // Button in the side panel
+            resetGame();
         });
 
         infoBtn.addEventListener('click', () => {
@@ -660,12 +783,12 @@
         touchRotate.addEventListener('click', () => !isPaused && !isGameOver && playerRotate());
         touchDown.addEventListener('click', () => !isPaused && !isGameOver && playerDrop());
 
-        // --- Initial Draw ---
-        initializePlayer();
-        draw();
+        // --- Initial Setup ---
+        resetGame(); // Set the initial state when the page loads.
     </script>
 </body>
 </html>
+
 
 
 
