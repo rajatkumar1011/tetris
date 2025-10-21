@@ -6,8 +6,8 @@
     <title>TETRIS</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='0' y='33.3' width='100' height='33.3' fill='%23FF0D72'/%3E%3Crect x='33.3' y='0' width='33.3' height='100' fill='%23FF0D72'/%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -19,10 +19,10 @@
         }
 
         body {
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Inter', sans-serif; /* Modern UI Font */
             color: var(--text-color);
-            overflow-y: auto; /* Allow vertical scrolling if content overflows */
-            touch-action: manipulation; /* Allows scrolling but prevents unwanted zoom */
+            overflow-y: auto;
+            touch-action: manipulation;
             background: linear-gradient(270deg, #0d0221, #240046, #5a189a, #9b2226, #005f73, #0a9396);
             background-size: 1200% 1200%;
             animation: gradientShift 45s ease infinite;
@@ -32,6 +32,10 @@
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        .title-font {
+            font-family: 'Press Start 2P', cursive; /* Retro Title Font */
         }
 
         .neon-glow {
@@ -50,39 +54,44 @@
         }
 
         .btn-control {
-            border: 2px solid var(--glow-color);
-            box-shadow: inset 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(0, 255, 255, 0.5);
-            background-color: rgba(13, 13, 13, 0.6);
-            backdrop-filter: blur(2px);
-            transition: background-color 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease-in-out;
             font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn-control:hover {
-            background-color: rgba(0, 255, 255, 0.2);
-            box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.5), 0 0 15px rgba(0, 255, 255, 0.8);
+        .btn-control:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            box-shadow: 0 6px 10px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
+        }
+        .btn-control:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
-        #infoBtn {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            width: 40px;
-            height: 40px;
-            z-index: 50;
-            font-size: 20px;
-            line-height: 1;
+        .side-panel-card {
+            background-color: rgba(13, 13, 13, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        #themeBtn {
+        #infoBtn, #themeBtn {
             position: absolute;
             top: 1rem;
-            right: 1rem;
             width: 40px;
             height: 40px;
             z-index: 50;
-            font-size: 20px;
-            line-height: 1;
         }
+        #infoBtn {
+            left: 1rem;
+            text-transform: none;
+        }
+        #themeBtn { right: 1rem; }
         
         #infoModal .modal-content {
             background-color: rgba(10, 10, 10, 0.8);
@@ -91,60 +100,49 @@
             box-shadow: 0 0 15px var(--glow-color), 0 0 5px var(--shadow-color) inset;
         }
 
-        #infoModal .modal-content ul {
-            text-align: left;
-            margin-top: 1rem;
-        }
-
-        #infoModal .modal-content li {
-            margin-bottom: 0.5rem;
-        }
-
-         #infoModal .modal-content strong {
-            color: var(--shadow-color);
-         }
-
          #closeInfoBtn {
             position: absolute;
-            top: 0.5rem;
-            right: 0.75rem;
-            font-size: 2rem;
+            top: 0.25rem;
+            right: 0.25rem;
+            width: 2rem;
+            height: 2rem;
+            font-size: 1.5rem;
             background: none;
             border: none;
             color: var(--text-color);
             cursor: pointer;
             transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
          }
          #closeInfoBtn:hover {
             color: var(--glow-color);
          }
         
-        /* Footer Styles */
         footer {
-            /* Positioned at the bottom, but relative to the flow to push content up */
             width: 100%;
             font-size: 0.625rem; /* 10px */
             color: #aaa;
-            margin-top: 3rem; /* Add more space between controls and footer */
-            padding-bottom: 1rem; /* Add some space at the very bottom */
+            margin-top: 3rem;
+            padding-bottom: 1rem;
         }
 
         .social-icon {
             color: var(--text-color);
             transition: color 0.2s, transform 0.2s;
         }
-
         .social-icon:hover {
             color: var(--glow-color);
             transform: scale(1.1);
         }
 
         .heart {
-            color: #FF0D72; /* Use a color from the game palette */
+            color: #FF0D72;
             display: inline-block;
             animation: pulse 1.5s infinite;
-            font-size: 1em; /* Ensure emoji scales with text */
-            vertical-align: middle; /* Better align with text */
+            font-size: 1em;
+            vertical-align: middle;
         }
 
         @keyframes pulse {
@@ -158,52 +156,31 @@
         }
 
         /* --- Theme Overrides --- */
-        /* Black Theme */
         body.theme-black {
-            background: #0d0d0d;
-            animation: none;
+            background: #0d0d0d; animation: none;
         }
-        
-        /* White Theme */
         body.theme-white {
-            background: #f0f0f0;
-            color: #222;
-            animation: none;
+            background: #f0f0f0; color: #222; animation: none;
         }
-        body.theme-white .neon-glow {
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-            color: #111;
-        }
-        body.theme-white canvas {
-            border-color: #555;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
+        body.theme-white .neon-glow { text-shadow: none; color: #111; }
+        body.theme-white canvas { border-color: #555; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
         body.theme-white #tetris { background-color: #fdfdfd; }
-        body.theme-white .bg-gray-900 {
+        body.theme-white .side-panel-card {
             background-color: #e0e0e0;
             border-color: #999;
         }
-         body.theme-white .text-purple-400, body.theme-white .text-cyan-400, body.theme-white .text-green-400, body.theme-white .text-yellow-400 {
-            color: #333;
-        }
+        body.theme-white .text-purple-400, body.theme-white .text-cyan-400, body.theme-white .text-green-400, body.theme-white .text-yellow-400 { color: #333; }
         body.theme-white #score, body.theme-white #level { color: #222; }
         body.theme-white .btn-control {
             border-color: #555;
             box-shadow: 0 0 5px rgba(0,0,0,0.2);
             color: #222;
-            background-color: #e9e9e9;
+            background: #e9e9e9;
         }
         body.theme-white .btn-control:hover { background-color: #555; color: #fff; }
-        body.theme-white .modal-content {
-             box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        }
-        body.theme-white #infoModal .modal-content {
-            background-color: rgba(250, 250, 250, 0.9);
-            border: 2px solid #555;
-        }
-        body.theme-white #gameOverModal .modal-content {
-             background-color: #f9f9f9;
-        }
+        body.theme-white .modal-content { box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+        body.theme-white #infoModal .modal-content { background-color: rgba(250, 250, 250, 0.9); border: 2px solid #555; }
+        body.theme-white #gameOverModal .modal-content { background-color: #f9f9f9; }
         body.theme-white #closeInfoBtn { color: #222; }
         body.theme-white footer { color: #666; }
         body.theme-white .social-icon { color: #222; }
@@ -216,50 +193,55 @@
     <button id="infoBtn" class="rounded-full btn-control">i</button>
     <button id="themeBtn" class="rounded-full btn-control">🎨</button>
 
-    <h1 class="text-3xl md:text-4xl mb-4 md:mb-6 neon-glow">TETRIS</h1>
+    <h1 class="text-3xl md:text-4xl mb-4 md:mb-6 neon-glow title-font">TETRIS</h1>
 
-    <div class="flex flex-col md:flex-row gap-3 items-start">
+    <div class="flex flex-col md:flex-row gap-4 items-start">
         <!-- Game Canvas -->
         <div class="relative">
             <canvas id="tetris" width="210" height="441"></canvas>
         </div>
 
         <!-- Side Panel -->
-        <div class="w-full md:w-[140px] flex flex-col gap-3">
+        <div class="w-full md:w-[150px] flex flex-col gap-3">
             <!-- Score -->
-            <div class="bg-gray-900 p-3 rounded-lg border-2 border-purple-500 shadow-lg text-center">
-                <h2 class="text-base text-purple-400">SCORE</h2>
-                <p id="score" class="text-2xl mt-1">0</p>
+            <div class="side-panel-card p-3 rounded-lg text-center">
+                <h2 class="text-sm text-gray-400 uppercase tracking-wider">SCORE</h2>
+                <p id="score" class="text-2xl mt-1 font-bold">0</p>
             </div>
 
             <!-- Level -->
-            <div class="bg-gray-900 p-3 rounded-lg border-2 border-green-500 shadow-lg text-center">
-                <h2 class="text-base text-green-400">LEVEL</h2>
-                <p id="level" class="text-2xl mt-1">0</p>
+            <div class="side-panel-card p-3 rounded-lg text-center">
+                <h2 class="text-sm text-gray-400 uppercase tracking-wider">LEVEL</h2>
+                <p id="level" class="text-2xl mt-1 font-bold">0</p>
             </div>
 
             <!-- Next Piece -->
-            <div class="bg-gray-900 p-3 rounded-lg border-2 border-cyan-500 shadow-lg text-center">
-                <h2 class="text-base text-cyan-400">NEXT</h2>
+            <div class="side-panel-card p-3 rounded-lg text-center">
+                <h2 class="text-sm text-gray-400 uppercase tracking-wider">NEXT</h2>
                 <canvas id="next" width="84" height="84" class="mx-auto mt-1 !border-0 !shadow-none"></canvas>
             </div>
             
-            <div class="w-full">
-                <button id="startBtn" class="w-full p-2 rounded-lg text-base btn-control">START</button>
-            </div>
-            
-            <div class="w-full">
-                <button id="restartGameBtn" class="w-full p-2 rounded-lg text-base btn-control">RESTART</button>
+            <div class="w-full mt-2 flex flex-col gap-2">
+                <button id="startBtn" class="w-full py-3 rounded-lg text-sm btn-control">Start</button>
+                <button id="restartGameBtn" class="w-full py-3 rounded-lg text-sm btn-control">Restart</button>
             </div>
         </div>
     </div>
 
     <!-- Mobile Touch Controls -->
-    <div class="md:hidden mt-3 grid grid-cols-3 grid-rows-2 gap-2 w-[210px]">
-         <button id="touch-left" class="col-start-1 row-start-2 text-xl rounded-lg btn-control">&#x2190;</button>
-         <button id="touch-right" class="col-start-3 row-start-2 text-xl rounded-lg btn-control">&#x2192;</button>
-         <button id="touch-rotate" class="col-start-2 row-start-1 text-xl rounded-lg btn-control">&#x21BB;</button>
-         <button id="touch-down" class="col-start-2 row-start-2 text-xl rounded-lg btn-control">&#x2193;</button>
+    <div class="md:hidden mt-4 grid grid-cols-3 grid-rows-2 gap-2 w-[210px]">
+         <button id="touch-left" class="col-start-1 row-start-2 h-16 rounded-lg btn-control flex justify-center items-center">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+         </button>
+         <button id="touch-right" class="col-start-3 row-start-2 h-16 rounded-lg btn-control flex justify-center items-center">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+         </button>
+         <button id="touch-rotate" class="col-start-2 row-start-1 h-16 rounded-lg btn-control flex justify-center items-center">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4 4l16 16"></path></svg>
+         </button>
+         <button id="touch-down" class="col-start-2 row-start-2 h-16 rounded-lg btn-control flex justify-center items-center">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+         </button>
     </div>
 
     <!-- Footer -->
@@ -273,29 +255,29 @@
             </a>
         </div>
         <p class="made-by-text mb-1">Made with <span class="heart">&hearts;</span> by Rajat Kumar</p>
-        <p class="copyright-text">&copy; 2025 Rajat Kumar. All Rights Reserved.</p>
+        <p class="copyright-text"><a href="https://en.wikipedia.org/wiki/Tetris" target="_blank" rel="noopener noreferrer" class="hover:underline">Learn More : https://en.wikipedia.org/wiki/Tetris</a></p>
     </footer>
 
     <!-- Info Modal -->
     <div id="infoModal" class="fixed inset-0 flex items-start justify-start pt-20 pl-4 hidden opacity-0 transition-opacity duration-300 bg-black bg-opacity-80 z-50">
-        <div class="modal-content p-4 rounded-lg text-center max-w-[280px] relative">
+        <div class="modal-content p-3 rounded-lg text-center max-w-[260px] relative">
             <button id="closeInfoBtn">&times;</button>
-            <h2 class="text-2xl neon-glow mb-4">HOW TO PLAY</h2>
+            <h2 class="text-xl neon-glow title-font mb-3 pr-10">HOW TO PLAY</h2>
             
-            <div class="text-left space-y-3 text-xs">
+            <div class="text-left space-y-2 text-xs">
                 <div>
-                    <h3 class="text-base text-cyan-400 mb-1">CONTROLS</h3>
-                    <ul class="list-disc list-inside">
+                    <h3 class="text-sm text-cyan-400 mb-1">CONTROLS</h3>
+                    <ul class="list-disc list-inside leading-snug">
                         <li><strong>Arrow Keys:</strong> Move Left/Right/Down</li>
                         <li><strong>Up Arrow:</strong> Rotate Piece</li>
-                        <li><strong>Spacebar:</strong> Hard Drop (Instantly drop piece)</li>
-                        <li><strong>START/PAUSE:</strong> Toggles the game state</li>
+                        <li><strong>Spacebar:</strong> Hard Drop</li>
+                        <li><strong>START/PAUSE:</strong> Toggles game</li>
                     </ul>
                 </div>
 
                 <div>
-                    <h3 class="text-base text-purple-400 mb-1">SCORING</h3>
-                    <ul class="list-disc list-inside">
+                    <h3 class="text-sm text-purple-400 mt-2 mb-1">SCORING</h3>
+                    <ul class="list-disc list-inside leading-snug">
                         <li><strong>1 Line:</strong> 100 Points</li>
                         <li><strong>2 Lines:</strong> 300 Points</li>
                         <li><strong>3 Lines:</strong> 500 Points</li>
@@ -304,13 +286,8 @@
                 </div>
 
                 <div>
-                    <h3 class="text-base text-green-400 mb-1">LEVELING UP</h3>
-                    <p>Clear 10 lines to advance to the next level. Each level increases the falling speed of the pieces!</p>
-                </div>
-
-                 <div>
-                    <h3 class="text-base text-yellow-400 mb-1">OBJECTIVE</h3>
-                    <p>Complete horizontal lines to clear them from the board. The game ends if the blocks stack up to the top of the screen.</p>
+                    <h3 class="text-sm text-green-400 mt-2 mb-1">LEVELING UP</h3>
+                    <p class="leading-snug">Clear 10 lines to advance to the next level. Each level increases the falling speed!</p>
                 </div>
             </div>
         </div>
@@ -319,10 +296,10 @@
     <!-- Game Over Modal -->
     <div id="gameOverModal" class="fixed inset-0 flex items-center justify-center hidden opacity-0 z-50">
         <div class="modal-content p-8 rounded-lg text-center max-w-sm">
-            <h2 class="text-4xl neon-glow mb-4">GAME OVER</h2>
+            <h2 class="text-4xl neon-glow title-font mb-4">GAME OVER</h2>
             <p class="text-xl mb-2">Final Score:</p>
             <p id="finalScore" class="text-3xl text-yellow-400 mb-6">0</p>
-            <button id="restartBtn" class="w-full p-3 bg-gray-800 rounded-lg text-lg btn-control">RESTART</button>
+            <button id="restartBtn" class="w-full p-3 rounded-lg text-lg btn-control">RESTART</button>
         </div>
     </div>
 
@@ -378,11 +355,14 @@
             [[0, 6, 6], [6, 6, 0]],                 // S
             [[7, 7, 0], [0, 7, 7]],                 // Z
         ];
+        
+        const PIECE_NAMES = {1:'T', 2:'O', 3:'L', 4:'J', 5:'I', 6:'S', 7:'Z'};
 
         // --- Game State ---
         let board = createBoard();
         let player;
         let nextPiece;
+        let ghostPiece = null;
         let score = 0;
         let level = 0;
         let linesClearedTotal = 0;
@@ -416,6 +396,8 @@
             const pieces = 'TOLJISZ';
             const randPiece = pieces[Math.floor(Math.random() * pieces.length)];
             const newMatrix = createPiece(randPiece);
+            
+            ghostPiece = null;
 
             player.matrix = nextPiece.matrix;
             player.pos.y = 0;
@@ -453,8 +435,8 @@
 
             const deltaTime = time - lastTime;
             lastTime = time;
-
             dropCounter += deltaTime;
+
             if (dropCounter > dropInterval) {
                 playerDrop();
             }
@@ -471,19 +453,23 @@
             drawGrid(context); // Draw the background grid
 
             drawMatrix(board, { x: 0, y: 0 }, context, BLOCK_SIZE);
-            drawMatrix(player.matrix, player.pos, context, BLOCK_SIZE);
+            if (gameInProgress) {
+                drawMatrix(player.matrix, player.pos, context, BLOCK_SIZE, false);
+            }
             
             // Draw next piece
             nextContext.fillStyle = '#000';
             nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
             
-            const nextMatrix = nextPiece.matrix;
-            const offsetX = (nextCanvas.width / NEXT_BLOCK_SIZE - nextMatrix[0].length) / 2;
-            const offsetY = (nextCanvas.height / NEXT_BLOCK_SIZE - nextMatrix.length) / 2;
-            drawMatrix(nextMatrix, {x: offsetX, y: offsetY}, nextContext, NEXT_BLOCK_SIZE);
+            if (gameInProgress) {
+                const nextMatrix = nextPiece.matrix;
+                const offsetX = (nextCanvas.width / NEXT_BLOCK_SIZE - nextMatrix[0].length) / 2;
+                const offsetY = (nextCanvas.height / NEXT_BLOCK_SIZE - nextMatrix.length) / 2;
+                drawMatrix(nextMatrix, {x: offsetX, y: offsetY}, nextContext, NEXT_BLOCK_SIZE);
+            }
         }
 
-        function drawMatrix(matrix, offset, ctx, blockSize) {
+        function drawMatrix(matrix, offset, ctx, blockSize, isGhost = false) {
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
@@ -549,7 +535,7 @@
         function playerRotate() {
             const originalMatrix = player.matrix;
             const originalPos = player.pos.x;
-
+            
             player.matrix = rotate(player.matrix); // Apply new rotation
 
             let offset = 1;
@@ -661,6 +647,7 @@
             isPaused = true;
             isGameOver = false;
             board = createBoard();
+            ghostPiece = null;
             score = 0;
             level = 0;
             linesClearedTotal = 0;
@@ -670,12 +657,7 @@
             gameOverModal.classList.add('hidden', 'opacity-0');
             
             // Clear canvases and draw the empty grid
-            context.fillStyle = '#000';
-            context.fillRect(0, 0, canvas.width, canvas.height);
-            drawGrid(context);
-
-            nextContext.fillStyle = '#000';
-            nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            draw();
         }
 
         function startGame() {
@@ -805,5 +787,13 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 
 
